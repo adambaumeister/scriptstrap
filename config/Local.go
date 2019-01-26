@@ -4,6 +4,7 @@ import (
 	"github.com/adamb/scriptdeliver/errors"
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
+	"path/filepath"
 )
 
 type LocalConfig struct {
@@ -21,6 +22,10 @@ func (c LocalConfig) Read() ServerConfig {
 
 	err = yaml.Unmarshal(data, &config)
 	errors.CheckError(err)
+
+	for tn, tag := range config.Tags {
+		tag.initScript = filepath.Join(c.Location, tn, "init.sh")
+	}
 
 	return config
 }

@@ -1,6 +1,7 @@
 package sshchannel
 
 import (
+	"github.com/adamb/scriptdeliver/config"
 	"golang.org/x/crypto/ssh"
 	"io/ioutil"
 	"log"
@@ -10,11 +11,13 @@ import (
 type SshChannel struct {
 }
 
-func Open() SshChannel {
+func Open(config config.ServerConfig) SshChannel {
 
 	s := SshChannel{}
 
-	key, err := ioutil.ReadFile("C:\\Users\\adam\\.ssh\\testrsa")
+	tag := "test"
+
+	key, err := ioutil.ReadFile(config.Tags[tag].SshConfig.SshKeyFile)
 	if err != nil {
 		log.Fatalf("Unable to read key. %v", err)
 	}
@@ -24,7 +27,7 @@ func Open() SshChannel {
 	}
 
 	c := ssh.ClientConfig{
-		User: "adam",
+		User: config.Tags[tag].SshConfig.SshUser,
 		Auth: []ssh.AuthMethod{
 			ssh.PublicKeys(signer),
 		},

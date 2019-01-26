@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/adamb/go_osegp/bgp/errors"
 	"github.com/adamb/scriptdeliver/channels/sshchannel"
+	"io/ioutil"
 	"os"
 	"strings"
 )
@@ -13,11 +14,20 @@ type Config interface {
 }
 
 type ServerConfig struct {
-	Tags map[string]Tag
+	Tags map[string]*Tag
 }
 
 type Tag struct {
 	SshConfig sshchannel.Opts
+
+	initScript string
+}
+
+func (t *Tag) GetInitScript() []byte {
+	f, err := ioutil.ReadFile(t.initScript)
+	errors.CheckError(err)
+
+	return f
 }
 
 func GetFromEnv(key string) (string, bool) {
@@ -28,7 +38,7 @@ func GetFromEnv(key string) (string, bool) {
 	}
 }
 
-func GetConfig() Config {
+func GetConfig() ServerConfig {
 	s, result := GetFromEnv("SCRIPTSTRAP_CONFIG")
 
 	if result == false {
@@ -41,13 +51,13 @@ func GetConfig() Config {
 	fmt.Printf("%v\n", t)
 
 	var c Config
+	var sc ServerConfig
 	if t == "local" {
 		c = LocalConfig{
 			Location: loc,
 		}
-		sc := c.Read()
-		fmt.Printf("%v\n", sc.Tags["test"].SshConfig.SshKeyFile)
+		sc = c.Read()
 	}
 
-	return c
+	return sc
 }

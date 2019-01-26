@@ -1,8 +1,12 @@
 package main
 
-import "github.com/adamb/scriptdeliver/channels/sshchannel"
+import (
+	"github.com/adamb/scriptdeliver/channels/sshchannel"
+	"github.com/adamb/scriptdeliver/config"
+)
 
 func main() {
-	_ = sshchannel.Open()
+	c := config.GetConfig()
+	_ = sshchannel.Open(c)
 
 }
