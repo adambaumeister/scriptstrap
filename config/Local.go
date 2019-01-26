@@ -11,14 +11,16 @@ type LocalConfig struct {
 }
 
 // REad a yaml configuration
-func (c LocalConfig) Read() Config {
-	// Setup defaults
-	p := c.Location
+func (c LocalConfig) Read() ServerConfig {
+	config := ServerConfig{}
+
+	// Get server configuration
+	p := c.Location + "server_config.yml"
 	data, err := ioutil.ReadFile(p)
 	errors.CheckError(err)
 
-	err = yaml.Unmarshal(data, &c)
+	err = yaml.Unmarshal(data, &config)
 	errors.CheckError(err)
 
-	return c
+	return config
 }

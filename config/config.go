@@ -3,12 +3,21 @@ package config
 import (
 	"fmt"
 	"github.com/adamb/go_osegp/bgp/errors"
+	"github.com/adamb/scriptdeliver/channels/sshchannel"
 	"os"
 	"strings"
 )
 
 type Config interface {
-	Read() Config
+	Read() ServerConfig
+}
+
+type ServerConfig struct {
+	Tags map[string]Tag
+}
+
+type Tag struct {
+	SshConfig sshchannel.Opts
 }
 
 func GetFromEnv(key string) (string, bool) {
@@ -28,7 +37,7 @@ func GetConfig() Config {
 
 	splt := strings.Split(s, ":")
 	t := splt[0]
-	loc := splt[1]
+	loc := strings.Join(splt[1:], ":")
 	fmt.Printf("%v\n", t)
 
 	var c Config
@@ -36,6 +45,8 @@ func GetConfig() Config {
 		c = LocalConfig{
 			Location: loc,
 		}
+		sc := c.Read()
+		fmt.Printf("%v\n", sc.Tags["test"].SshConfig.SshKeyFile)
 	}
 
 	return c

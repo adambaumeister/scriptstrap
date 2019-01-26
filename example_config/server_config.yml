@@ -1,0 +1,5 @@
+tags:
+  test:
+    sshconfig:
+      sshkeyfile: C:\Users\adam\.ssh\testrsa
+      sshuser: adam
