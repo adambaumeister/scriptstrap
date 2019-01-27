@@ -18,7 +18,7 @@ type ServerConfig struct {
 }
 
 type Tag struct {
-	SshConfig sshchannel.Opts
+	SshConfig *sshchannel.Opts
 
 	initScript string
 }
@@ -28,6 +28,10 @@ func (t *Tag) GetInitScript() []byte {
 	errors.CheckError(err)
 
 	return f
+}
+
+func (sc *ServerConfig) GetTagConfig(t string) *Tag {
+	return sc.Tags[t]
 }
 
 func GetFromEnv(key string) (string, bool) {

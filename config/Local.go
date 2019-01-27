@@ -24,7 +24,11 @@ func (c LocalConfig) Read() ServerConfig {
 	errors.CheckError(err)
 
 	for tn, tag := range config.Tags {
-		tag.initScript = filepath.Join(c.Location, tn, "init.sh")
+		tag.initScript = filepath.Join(c.Location, "tags", tn, "init.sh")
+		if tag.SshConfig != nil {
+			tag.SshConfig.SshKey, err = ioutil.ReadFile(tag.SshConfig.SshKeyFile)
+			errors.CheckError(err)
+		}
 	}
 
 	return config

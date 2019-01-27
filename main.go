@@ -7,6 +7,7 @@ import (
 
 func main() {
 	c := config.GetConfig()
-	_ = sshchannel.Open(c)
-
+	tag := c.GetTagConfig("test")
+	s := sshchannel.Open(tag.SshConfig)
+	s.RunScript(tag.GetInitScript(), "init.sh")
 }
