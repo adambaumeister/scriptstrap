@@ -50,9 +50,14 @@ func Open(config *Opts) SshChannel {
 //	script name
 func (s *SshChannel) RunScript(f []byte, n string) {
 	s.WriteFile(f, n, s.scriptDir, s.scriptOwn)
-	//err := s.session.Run(s.scriptDir + n)
-	//errors.CheckError(err)
-	//fmt.Printf("Output: %v\n", string(s.stdout.Bytes()))
+
+	session, err := s.client.NewSession()
+	session.Stdout = s.stdout
+	s.sessions = append(s.sessions, session)
+
+	err = session.Run(s.scriptDir + n)
+	errors.CheckError(err)
+	fmt.Printf("Output: %v\n", string(s.stdout.Bytes()))
 }
 
 func (s *SshChannel) openConnection(h string, c ssh.ClientConfig) {
