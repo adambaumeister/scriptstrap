@@ -2,5 +2,9 @@ package api
 
 type EventJson struct {
 	Host string
-	tags []string
+	Tags []string
+}
+
+type JsonResponse struct {
+	Status string
 }

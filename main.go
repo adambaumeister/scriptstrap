@@ -1,16 +1,21 @@
 package main
 
 import (
-	"github.com/adamb/scriptdeliver/channels/sshchannel"
-	"github.com/adamb/scriptdeliver/config"
+	"fmt"
 	"github.com/adamb/scriptdeliver/events"
+	"github.com/adamb/scriptdeliver/events/api"
 )
 
 func main() {
-	c := config.GetConfig()
-
-	e := events.RouteEvent("192.168.1.18:22,test")
-	tag := c.GetTagConfig(e.GetTag())
-	s := sshchannel.Open(tag.SshConfig)
-	s.RunScript(tag.GetInitScript(), "init.sh")
+	a := api.API{
+		EventsOut: make(chan events.Event),
+	}
+	go a.StartApi()
+	fmt.Printf("Started all listeners.\n")
+	for {
+		select {
+		case e := <-a.EventsOut:
+			fmt.Printf("Host: %v\n", e.GetHost())
+		}
+	}
 }
