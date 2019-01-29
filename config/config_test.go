@@ -1,7 +1,12 @@
 package config
 
-import "testing"
+import (
+	"fmt"
+	"testing"
+)
 
 func TestConfig(t *testing.T) {
-	GetConfig()
+	sc := GetConfig()
+	name, _ := sc.Tags["test"].GetStateScript("init")
+	fmt.Printf("%v\n", name)
 }

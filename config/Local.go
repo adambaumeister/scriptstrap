@@ -5,6 +5,7 @@ import (
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
 	"path/filepath"
+	"strings"
 )
 
 type LocalConfig struct {
@@ -24,6 +25,7 @@ func (c LocalConfig) Read() ServerConfig {
 	errors.CheckError(err)
 
 	for tn, tag := range config.Tags {
+		tag.stateScripts = scriptsInDir(filepath.Join(c.Location, "tags", tn))
 		tag.initScript = filepath.Join(c.Location, "tags", tn, "init.sh")
 		if tag.SshConfig != nil {
 			tag.SshConfig.SshKey, err = ioutil.ReadFile(tag.SshConfig.SshKeyFile)
@@ -32,4 +34,14 @@ func (c LocalConfig) Read() ServerConfig {
 	}
 
 	return config
+}
+
+func scriptsInDir(dir string) map[string]string {
+	r := make(map[string]string)
+	files, err := ioutil.ReadDir(dir)
+	errors.CheckError(err)
+	for _, file := range files {
+		r[strings.Split(file.Name(), ".")[0]] = filepath.Join(dir, file.Name())
+	}
+	return r
 }

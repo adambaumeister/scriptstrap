@@ -1,7 +1,5 @@
 package errors
 
-import "log"
-
 /*
 Implements error handling for the BGP connector
 */
@@ -10,7 +8,8 @@ Implements error handling for the BGP connector
 // that this particular goroutine is screwed
 func RaiseError(e interface{}) {
 	//log.Print(e)
-	log.Fatal(e)
+	//log.Fatal(e)
+	panic(e)
 }
 
 // Check to see if the passed err value is non-nil and handle accordingly

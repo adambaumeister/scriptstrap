@@ -19,7 +19,9 @@ func (a *API) StartApi() {
 }
 
 func (a *API) NewEvent(w http.ResponseWriter, r *http.Request) {
-	e := EventJson{}
+	e := EventJson{
+		State: "init",
+	}
 
 	body, _ := ioutil.ReadAll(r.Body)
 	err := json.Unmarshal(body, &e)
@@ -27,6 +29,7 @@ func (a *API) NewEvent(w http.ResponseWriter, r *http.Request) {
 	ae := ApiEvent{}
 	ae.Host = e.Host
 	ae.Tag = e.Tags[0]
+	ae.State = e.State
 
 	response := JsonResponse{
 		Status: "OK",

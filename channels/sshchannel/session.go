@@ -20,7 +20,9 @@ type SshChannel struct {
 	sessions []*ssh.Session
 }
 
-func Open(config *Opts) SshChannel {
+// Opens a connection to the target host, using the options specified in the server configuration file
+// Options are on a per-tag basis.
+func Open(host string, config *Opts) SshChannel {
 
 	s := SshChannel{
 		scriptDir: "/tmp/",
@@ -41,7 +43,7 @@ func Open(config *Opts) SshChannel {
 		},
 		HostKeyCallback: s.checkHostKey,
 	}
-	s.openConnection("192.168.1.18:22", c)
+	s.openConnection(host+":22", c)
 	return s
 }
 
@@ -56,6 +58,7 @@ func (s *SshChannel) RunScript(f []byte, n string) {
 	s.sessions = append(s.sessions, session)
 
 	err = session.Run(s.scriptDir + n)
+	fmt.Printf("dir: %v, name: %v", s.scriptDir, n)
 	errors.CheckError(err)
 	fmt.Printf("Output: %v\n", string(s.stdout.Bytes()))
 }
