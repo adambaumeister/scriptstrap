@@ -8,6 +8,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"
 	"gopkg.in/yaml.v2"
+	"strings"
 )
 
 type S3Config struct {
@@ -16,7 +17,7 @@ type S3Config struct {
 	AwsSvc *s3.S3
 }
 
-func (c *S3Config) Read() ServerConfig {
+func (c S3Config) Read() ServerConfig {
 	config := ServerConfig{}
 
 	sess, _ := session.NewSession(&aws.Config{
@@ -49,9 +50,10 @@ func (c *S3Config) ScriptsFromTags(sc *ServerConfig) {
 		scripts := c.ListObjects(tn)
 		for _, sn := range scripts {
 			s := Script{}
-			s.Filename = sn
+			s.Filename = NameFromKey(sn)
 			s.Data = c.GetFileBytes(sn)
-			r[sn] = s
+			stateName := strings.Split(NameFromKey(sn), ".")[0]
+			r[stateName] = s
 		}
 		tag.stateScripts = r
 	}
@@ -86,4 +88,11 @@ func (c *S3Config) ListObjects(k string) []string {
 		r = append(r, *obj.Key)
 	}
 	return r
+}
+
+func NameFromKey(s string) string {
+	l := strings.Split(s, "/")
+	length := len(l)
+	str := l[length-1]
+	return str
 }

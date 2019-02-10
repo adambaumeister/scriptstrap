@@ -7,12 +7,15 @@ import (
 
 func TestConfig(t *testing.T) {
 	sc := GetConfig()
-	name, _ := sc.Tags["test"].GetStateScript("init")
+	tag := sc.GetTagConfig("test")
+	name, _ := tag.GetStateScript("init")
 	fmt.Printf("%v\n", name)
 }
 
-func TestS3(t *testing.T) {
+func S3Test(t *testing.T) {
 	c := S3Config{}
 	sc := c.Read()
-	fmt.Printf("%v\n", sc.Tags["test"].stateScripts)
+	tag := sc.GetTagConfig("test")
+	name, _ := tag.GetStateScript("init")
+	fmt.Printf("SCript name: %v\n", name)
 }

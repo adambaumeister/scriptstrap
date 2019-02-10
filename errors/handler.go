@@ -33,12 +33,12 @@ func CheckAwsError(err error) {
 			case s3.ErrCodeNoSuchBucket:
 				fmt.Println(s3.ErrCodeNoSuchBucket, aerr.Error())
 			default:
-				fmt.Println(aerr.Error())
+				panic(aerr.Error())
 			}
 		} else {
 			// Print the error, cast err to awserr.Error to get the Code and
 			// Message from an error.
-			fmt.Println(err.Error())
+			panic(err.Error())
 		}
 		RaiseError(err)
 		return

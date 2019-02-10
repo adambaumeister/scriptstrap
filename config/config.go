@@ -75,8 +75,12 @@ func GetConfig() ServerConfig {
 		c = LocalConfig{
 			Location: loc,
 		}
-		sc = c.Read()
+	} else if t == "s3" {
+		c = S3Config{
+			Location: loc,
+		}
 	}
+	sc = c.Read()
 
 	return sc
 }
