@@ -36,12 +36,16 @@ func (c LocalConfig) Read() ServerConfig {
 	return config
 }
 
-func scriptsInDir(dir string) map[string]string {
-	r := make(map[string]string)
+func scriptsInDir(dir string) map[string]Script {
+	r := make(map[string]Script)
 	files, err := ioutil.ReadDir(dir)
 	errors.CheckError(err)
 	for _, file := range files {
-		r[strings.Split(file.Name(), ".")[0]] = filepath.Join(dir, file.Name())
+		s := Script{}
+		s.Data, err = ioutil.ReadFile(filepath.Join(dir, file.Name()))
+		s.Filename = file.Name()
+		errors.CheckError(err)
+		r[strings.Split(file.Name(), ".")[0]] = s
 	}
 	return r
 }

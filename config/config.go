@@ -6,7 +6,6 @@ import (
 	"github.com/adamb/scriptdeliver/channels/sshchannel"
 	"io/ioutil"
 	"os"
-	"path/filepath"
 	"strings"
 )
 
@@ -22,7 +21,7 @@ type Tag struct {
 	SshConfig *sshchannel.Opts
 
 	initScript   string
-	stateScripts map[string]string
+	stateScripts map[string]Script
 }
 
 func (t *Tag) GetInitScript() []byte {
@@ -32,11 +31,13 @@ func (t *Tag) GetInitScript() []byte {
 	return f
 }
 
+type Script struct {
+	Data     []byte
+	Filename string
+}
+
 func (t *Tag) GetStateScript(s string) (string, []byte) {
-	f, err := ioutil.ReadFile(t.stateScripts[s])
-	errors.CheckError(err)
-	fmt.Printf("DEBUG: %v\n", filepath.Base(t.stateScripts[s]))
-	return filepath.Base(t.stateScripts[s]), f
+	return t.stateScripts[s].Filename, t.stateScripts[s].Data
 }
 
 func (sc *ServerConfig) GetTagConfig(t string) *Tag {

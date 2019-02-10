@@ -16,7 +16,7 @@ type S3Config struct {
 	AwsSvc *s3.S3
 }
 
-func (c *S3Config) Read() {
+func (c *S3Config) Read() ServerConfig {
 	config := ServerConfig{}
 
 	sess, _ := session.NewSession(&aws.Config{
@@ -39,22 +39,51 @@ func (c *S3Config) Read() {
 	err = yaml.Unmarshal(buf.Bytes(), &config)
 	errors.CheckError(err)
 
-	for tn, _ := range config.Tags {
-		fmt.Printf("%v\n", tn)
-	}
-
+	c.ScriptsFromTags(&config)
+	return config
 }
 
-func (c *S3Config) GetStateScript(s string) (string, []byte) {
+func (c *S3Config) ScriptsFromTags(sc *ServerConfig) {
+	for tn, tag := range sc.Tags {
+		r := make(map[string]Script)
+		scripts := c.ListObjects(tn)
+		for _, sn := range scripts {
+			s := Script{}
+			s.Filename = sn
+			s.Data = c.GetFileBytes(sn)
+			r[sn] = s
+		}
+		tag.stateScripts = r
+	}
+}
+
+func (c *S3Config) GetFileBytes(k string) []byte {
 	svc := c.AwsSvc
 	configObject, err := svc.GetObject(&s3.GetObjectInput{
 		Bucket: aws.String("testscriptstrap"),
-		Key:    aws.String(s),
+		Key:    aws.String(k),
 	})
 	errors.CheckAwsError(err)
 	c.AwsSvc = svc
 
 	buf := new(bytes.Buffer)
 	buf.ReadFrom(configObject.Body)
-	return s, buf.Bytes()
+	return buf.Bytes()
+}
+
+func (c *S3Config) ListObjects(k string) []string {
+	var r []string
+
+	svc := c.AwsSvc
+	objs, err := svc.ListObjects(&s3.ListObjectsInput{
+		Bucket: aws.String("testscriptstrap"),
+		Prefix: aws.String(fmt.Sprintf("%v/%v/", "tags", k)),
+	})
+	errors.CheckAwsError(err)
+	c.AwsSvc = svc
+
+	for _, obj := range objs.Contents {
+		r = append(r, *obj.Key)
+	}
+	return r
 }
