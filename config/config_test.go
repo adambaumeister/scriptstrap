@@ -14,4 +14,5 @@ func TestConfig(t *testing.T) {
 func TestS3(t *testing.T) {
 	c := S3Config{}
 	c.Read()
+	c.GetStateScript("tags/test/init.sh")
 }
